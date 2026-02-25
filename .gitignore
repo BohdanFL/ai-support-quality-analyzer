@@ -7,4 +7,5 @@ analysis_results.json
 test_chats.json
 .vscode/
 *.pdf
-*.json
+venv/
+.env/
