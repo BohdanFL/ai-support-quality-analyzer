@@ -1,4 +1,5 @@
 from llm_factory import get_llm_provider
+from models import AnalysisResult
 import argparse
 import json
 import os
@@ -49,9 +50,13 @@ def analyze_chat(provider, chat_data: Dict) -> Dict:
         role = "Customer" if msg["role"] == "user" else "Agent"
         messages_str += f"{role}: {msg['content']}\n"
     
-    prompt = f"Analyze the following support chat:\n\n{messages_str}\n\nReturn the analysis as JSON."
+    prompt = f"Analyze the following support chat:\n\n{messages_str}"
     
-    response_text = provider.generate(prompt, system_prompt=ANALYSIS_SYSTEM_PROMPT)
+    response_text = provider.generate(
+        prompt, 
+        system_prompt=ANALYSIS_SYSTEM_PROMPT,
+        response_schema=AnalysisResult
+    )
     
     # Cleaning
     cleaned_response = response_text.strip()
@@ -64,10 +69,13 @@ def analyze_chat(provider, chat_data: Dict) -> Dict:
         cleaned_response = cleaned_response[4:].strip()
 
     try:
-        return json.loads(cleaned_response)
-    except json.JSONDecodeError:
-        print(f"Error decoding JSON from analyst response: {response_text[:100]}...")
-        return {"error": "Failed to parse", "raw": response_text}
+        data = json.loads(cleaned_response)
+        # Validate with Pydantic
+        validated_analysis = AnalysisResult(**data)
+        return validated_analysis.model_dump()
+    except Exception as e:
+        print(f"Error validating/parsing analysis: {str(e)}")
+        return {"error": "Failed to parse/validate", "details": str(e), "raw": response_text}
 
 def main():
     parser = argparse.ArgumentParser(description="Analyze support chat dataset")

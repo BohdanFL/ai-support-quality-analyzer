@@ -1,6 +1,6 @@
 import os
 from groq import Groq
-from typing import Optional
+from typing import Optional, Any
 from providers.base import LLMProvider
 from dotenv import load_dotenv
 
@@ -14,11 +14,16 @@ class GroqProvider(LLMProvider):
         self.client = Groq(api_key=api_key)
         self.model_name = model_name
 
-    def generate(self, prompt: str, system_prompt: Optional[str] = None) -> str:
+    def generate(self, prompt: str, system_prompt: Optional[str] = None, response_schema: Optional[Any] = None) -> str:
         messages = []
         if system_prompt:
             messages.append({"role": "system", "content": system_prompt})
         messages.append({"role": "user", "content": prompt})
+
+        # Groq doesn't support schema directly in the same way, but supports JSON mode
+        extra_args = {}
+        if response_schema:
+             extra_args["response_format"] = {"type": "json_object"}
 
         completion = self.client.chat.completions.create(
             model=self.model_name,
@@ -28,6 +33,7 @@ class GroqProvider(LLMProvider):
             top_p=1,
             stream=False,
             stop=None,
+            **extra_args
         )
         return completion.choices[0].message.content
 

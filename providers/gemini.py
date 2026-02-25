@@ -1,6 +1,6 @@
 import os
 from google import genai
-from typing import Optional
+from typing import Optional, Any
 from providers.base import LLMProvider
 from dotenv import load_dotenv
 
@@ -15,10 +15,14 @@ class GeminiProvider(LLMProvider):
         self.client = genai.Client(api_key=api_key)
         self.model_name = model_name
 
-    def generate(self, prompt: str, system_prompt: Optional[str] = None) -> str:
+    def generate(self, prompt: str, system_prompt: Optional[str] = None, response_schema: Optional[Any] = None) -> str:
         config = {}
         if system_prompt:
             config['system_instruction'] = system_prompt
+        
+        if response_schema:
+            config['response_mime_type'] = 'application/json'
+            config['response_schema'] = response_schema
             
         try:
             response = self.client.models.generate_content(

@@ -1,13 +1,13 @@
 import requests
-from typing import Optional
+from typing import Optional, Any
 from providers.base import LLMProvider
 
 class OllamaProvider(LLMProvider):
-    def __init__(self, model_name: str = "llama3", base_url: str = "http://localhost:11434"):
+    def __init__(self, model_name: str = "gemma3:1b", base_url: str = "http://localhost:11434"):
         self.model_name = model_name
         self.base_url = f"{base_url}/api/generate"
 
-    def generate(self, prompt: str, system_prompt: Optional[str] = None) -> str:
+    def generate(self, prompt: str, system_prompt: Optional[str] = None, response_schema: Optional[Any] = None) -> str:
         payload = {
             "model": self.model_name,
             "prompt": prompt,
@@ -15,6 +15,9 @@ class OllamaProvider(LLMProvider):
         }
         if system_prompt:
             payload["system"] = system_prompt
+        
+        if response_schema:
+            payload["format"] = "json"
 
         try:
             response = requests.post(self.base_url, json=payload)

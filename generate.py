@@ -1,4 +1,5 @@
 from llm_factory import get_llm_provider
+from models import SupportChat
 import argparse
 import json
 import os
@@ -37,9 +38,14 @@ Make the dialogues feel natural, not overly robotic. Support agents should try t
 """
 
 def generate_chat(provider, scenario: str, case_type: str) -> Dict:
-    prompt = f"Generate a realistic customer support chat about '{scenario}'. The case type is: '{case_type}'. Return ONLY the JSON object."
+    prompt = f"Generate a realistic customer support chat about '{scenario}'. The case type is: '{case_type}'."
     
-    response_text = provider.generate(prompt, system_prompt=GENERATION_SYSTEM_PROMPT)
+    # Use Pydantic schema if supported by provider
+    response_text = provider.generate(
+        prompt, 
+        system_prompt=GENERATION_SYSTEM_PROMPT,
+        response_schema=SupportChat
+    )
     
     # Cleaning common LLM artifacts like ```json ... ```
     cleaned_response = response_text.strip()
@@ -52,10 +58,13 @@ def generate_chat(provider, scenario: str, case_type: str) -> Dict:
         cleaned_response = cleaned_response[4:].strip()
 
     try:
-        return json.loads(cleaned_response)
-    except json.JSONDecodeError:
-        print(f"Error decoding JSON from provider response: {response_text[:100]}...")
-        return {"error": "Failed to parse", "raw": response_text}
+        data = json.loads(cleaned_response)
+        # Validate with Pydantic
+        validated_chat = SupportChat(**data)
+        return validated_chat.model_dump()
+    except Exception as e:
+        print(f"Error validating/parsing JSON: {str(e)}")
+        return {"error": "Failed to parse/validate", "details": str(e), "raw": response_text}
 
 def main():
     parser = argparse.ArgumentParser(description="Generate support chat dataset")
