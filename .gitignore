@@ -6,3 +6,5 @@ generated_chats.json
 analysis_results.json
 test_chats.json
 .vscode/
+*.pdf
+*.json

@@ -7,29 +7,25 @@ class OllamaProvider(LLMProvider):
         self.model_name = model_name
         self.client = ollama.Client(host=host)
 
-    def generate(self, prompt: str, system_prompt: Optional[str] = None, response_schema: Optional[Any] = None) -> str:
-        messages = []
-        if system_prompt:
-            messages.append({"role": "system", "content": system_prompt})
-        messages.append({"role": "user", "content": prompt})
-
+    def generate(self, prompt: str, system_prompt: Optional[str] = None,response_schema: Optional[Any] = None) -> str:
         format_param = None
         if response_schema:
-            try:
-                # Use Pydantic's JSON schema for Ollama's format parameter
+            # Use Pydantic's JSON schema feature to guide Ollama
+            if hasattr(response_schema, "model_json_schema"):
                 format_param = response_schema.model_json_schema()
-            except AttributeError:
+            else:
                 format_param = "json"
 
         try:
-            response = self.client.chat(
+            response = self.client.generate(
                 model=self.model_name,
-                messages=messages,
+                prompt=prompt,
+                system=system_prompt,
                 format=format_param,
-                stream=False,
-                options={'temperature': 0}
+                options={'temperature': 0.2},
+                stream=False
             )
-            return response.message.content
+            return response.get("response", "")
         except Exception as e:
             return f"Error connecting to Ollama: {str(e)}"
 
