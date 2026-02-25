@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.env
+results/
+generated_chats.json
+analysis_results.json
+test_chats.json
+.vscode/
