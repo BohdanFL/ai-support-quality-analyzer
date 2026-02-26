@@ -8,7 +8,7 @@ services:
             - "11434:11434"
         restart: unless-stopped
 
-    ll_app:
+    llm_app:
         build: .
         container_name: llm_analytics
         depends_on:
