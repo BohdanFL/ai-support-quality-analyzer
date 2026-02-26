@@ -3,7 +3,7 @@ from typing import Optional, Any
 from providers.base import LLMProvider
 
 class OllamaProvider(LLMProvider):
-    def __init__(self, model_name: str = "gemma3:1b", host: str = "http://localhost:11434"):
+    def __init__(self, model_name: str = "gemma3:1b", host: str = "http://ollama:11434"):
         self.model_name = model_name
         self.client = ollama.Client(host=host)
 
