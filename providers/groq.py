@@ -15,15 +15,17 @@ class GroqProvider(LLMProvider):
         self.model_name = model_name
 
     def generate(self, prompt: str, system_prompt: Optional[str] = None, response_schema: Optional[Any] = None) -> str:
-        messages = []
-        if system_prompt:
-            messages.append({"role": "system", "content": system_prompt})
-        messages.append({"role": "user", "content": prompt})
-
         # Groq doesn't support schema directly in the same way, but supports JSON mode
         extra_args = {}
         if response_schema:
              extra_args["response_format"] = {"type": "json_object"}
+             if "json" not in prompt.lower() and (not system_prompt or "json" not in system_prompt.lower()):
+                 prompt += "\n\nReturn the result in JSON format."
+
+        messages = []
+        if system_prompt:
+            messages.append({"role": "system", "content": system_prompt})
+        messages.append({"role": "user", "content": prompt})
 
         completion = self.client.chat.completions.create(
             model=self.model_name,

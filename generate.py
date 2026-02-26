@@ -10,7 +10,7 @@ SCENARIOS = [
     "payment issues",
     "technical errors",
     "account access",
-    "pricing questions",
+    "tariff_questions",
     "refund requests"
 ]
 
@@ -78,7 +78,7 @@ def main():
     dataset = []
     
     print(f"Generating {args.count} chats using {args.provider}...")
-    
+
     for i in range(args.count):
         scenario = SCENARIOS[i % len(SCENARIOS)]
         case_type = CASE_TYPES[i % len(CASE_TYPES)]

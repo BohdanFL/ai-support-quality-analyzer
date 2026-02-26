@@ -5,77 +5,22 @@ import json
 import os
 from typing import List, Dict, Optional
 
-ANALYSIS_SYSTEM_PROMPT = """
-You are an expert customer support quality analyst. 
-Your task is to analyze a support dialogue and provide a structured assessment in JSON format.
+from judge_agent.evaluation_agent import LLMJudge
+from judge_agent.metrics.support_quality import SupportQualityMetric
 
-Categories for 'intent':
-- payment issues
-- technical errors
-- account access
-- pricing questions
-- refund requests
-- other
-
-Categories for 'satisfaction':
-- satisfied
-- neutral
-- unsatisfied
-
-Scale for 'quality_score': 1 to 5 (Integer)
-
-Possible values for 'agent_mistakes' (as a list):
-- ignored_question
-- incorrect_info
-- rude_tone
-- no_resolution
-- unnecessary_escalation
-(Leave list empty if no mistakes were made)
-
-CRITICAL: Some customers might display "hidden dissatisfaction". They may formally say "thank you" or "okay", but if their problem was NOT actually resolved or the agent provided useless info, mark it as 'unsatisfied' or 'neutral' and note the lack of resolution in 'agent_mistakes'.
-
-Return ONLY a JSON object with these keys:
-{
-  "intent": "...",
-  "satisfaction": "...",
-  "quality_score": 0,
-  "agent_mistakes": ["...", "..."]
-}
-"""
-
-def analyze_chat(provider, chat_data: Dict) -> Dict:
-    # Convert chat messages to a readable string for the LLM
+def analyze_chat(judge: LLMJudge, chat_data: Dict) -> Dict:
+    # Convert chat messages to a readable string for the judge
     messages_str = ""
     for msg in chat_data.get("messages", []):
         role = "Customer" if msg["role"] == "user" else "Agent"
         messages_str += f"{role}: {msg['content']}\n"
     
-    prompt = f"Analyze the following support chat:\n\n{messages_str}"
+    # The judge evaluates the dialogue using the registered metrics
+    results = judge.evaluate_dialogue(messages_str)
     
-    response_text = provider.generate(
-        prompt, 
-        system_prompt=ANALYSIS_SYSTEM_PROMPT,
-        response_schema=AnalysisResult
-    )
-    
-    # Cleaning
-    cleaned_response = response_text.strip()
-    if cleaned_response.startswith("```"):
-        cleaned_response = cleaned_response.split("\n", 1)[1]
-    if cleaned_response.endswith("```"):
-        cleaned_response = cleaned_response.rsplit("\n", 1)[0]
-    cleaned_response = cleaned_response.strip()
-    if cleaned_response.startswith("json"):
-        cleaned_response = cleaned_response[4:].strip()
-
-    try:
-        data = json.loads(cleaned_response)
-        # Validate with Pydantic
-        validated_analysis = AnalysisResult(**data)
-        return validated_analysis.model_dump()
-    except Exception as e:
-        print(f"Error validating/parsing analysis: {str(e)}")
-        return {"error": "Failed to parse/validate", "details": str(e), "raw": response_text}
+    # Since we only use one metric for now, we return its result
+    # We can also return the whole Dict[metric_name, result] if needed
+    return results.get("support_quality_analysis", results)
 
 def main():
     parser = argparse.ArgumentParser(description="Analyze support chat dataset")
@@ -93,17 +38,22 @@ def main():
         dataset = json.load(f)
         
     provider = get_llm_provider(args.provider)
+    
+    # Initialize the Judge with metrics
+    metrics = [SupportQualityMetric()]
+    judge = LLMJudge(provider=provider, metrics=metrics)
+    
     results = []
     
     print(f"Analyzing {len(dataset)} chats using {args.provider}...")
     
     for i, chat in enumerate(dataset):
-        if "error" in chat:
-            print(f"[{i+1}/{len(dataset)}] Skipping chat with generation error.")
+        if not chat or "error" in chat:
+            print(f"[{i+1}/{len(dataset)}] Skipping invalid chat.")
             continue
             
         print(f"[{i+1}/{len(dataset)}] Analyzing chat...")
-        analysis = analyze_chat(provider, chat)
+        analysis = analyze_chat(judge, chat)
         
         # Combine original chat with its analysis for the final report
         results.append({

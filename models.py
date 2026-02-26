@@ -12,7 +12,7 @@ class SupportChat(BaseModel):
         "payment issues",
         "technical errors",
         "account access",
-        "pricing questions",
+        "tariff_questions",
         "refund requests"
     ]
     type: str = Field(description="The behavior case type (e.g., successful, hidden dissatisfaction)")
@@ -30,7 +30,7 @@ class AnalysisResult(BaseModel):
         "payment issues",
         "technical errors",
         "account access",
-        "pricing questions",
+        "tariff_questions",
         "refund requests",
         "other"
     ]
