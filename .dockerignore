@@ -1,0 +1,46 @@
+# Змінні оточення (НІКОЛИ не копіювати в образ!)
+.env
+.env.local
+.env.*.local
+*.env
+
+# Віртуальне оточення Python
+venv
+env
+.env/
+.venv
+ENV/
+env.bak/
+venv.bak/
+__pycache__/
+
+# Файли IDE та редакторів
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Логи та бази даних
+*.log
+*.sqlite3
+*.db
+
+# Тести та документація (не потрібні в продакшн образі)
+tests/
+docs/
+*.md
+*.rst
+*.txt
+!requirements.txt
+
+# Файли збірки
+dist/
+build/
+*.egg-info/
