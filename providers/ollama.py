@@ -3,9 +3,10 @@ from typing import Optional, Any
 from providers.base import LLMProvider
 
 class OllamaProvider(LLMProvider):
-    def __init__(self, model_name: str = "gemma3:1b", host: str = "http://ollama:11434"):
+    def __init__(self, model_name: str = "llama2", host: str = "http://ollama:11434"):
         self.model_name = model_name
         self.client = ollama.Client(host=host)
+        print(f"Host: {host}, model_name: {model_name} ")
 
     def generate(self, prompt: str, system_prompt: Optional[str] = None,response_schema: Optional[Any] = None) -> str:
         format_param = None
