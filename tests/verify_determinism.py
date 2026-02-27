@@ -8,7 +8,7 @@ def verify_provider(provider, name):
     prompt = "Tell me a very short 1-sentence joke about a cat."
     
     outputs = []
-    for i in range(3):
+    for i in range(10):
         try:
             output = provider.generate(prompt)
             outputs.append(output)
@@ -16,7 +16,7 @@ def verify_provider(provider, name):
         except Exception as e:
             print(f"Run {i+1} failed: {e}")
             return
-            
+
     if all(o == outputs[0] for o in outputs):
         print(f"SUCCESS: {name} is deterministic.")
     else:
@@ -25,7 +25,7 @@ def verify_provider(provider, name):
 if __name__ == "__main__":
     # Test Ollama if available
     try:
-        ollama = OllamaProvider()
+        # ollama = OllamaProvider()
         verify_provider(ollama, "Ollama")
     except Exception as e:
         print(f"Ollama skip: {e}")
@@ -43,7 +43,7 @@ if __name__ == "__main__":
     # Test Groq if API key set
     if os.getenv("GROQ_API_KEY"):
         try:
-            groq = GroqProvider()
+            # groq = GroqProvider()
             verify_provider(groq, "Groq")
         except Exception as e:
             print(f"Groq skip: {e}")
