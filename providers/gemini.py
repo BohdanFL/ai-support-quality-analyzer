@@ -23,7 +23,7 @@ class GeminiProvider(LLMProvider):
         if response_schema:
             config['response_mime_type'] = 'application/json'
             config['response_schema'] = response_schema
-            
+
         try:
             response = self.client.models.generate_content(
                 model=self.model_name,

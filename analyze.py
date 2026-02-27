@@ -1,5 +1,5 @@
 from llm_factory import get_llm_provider
-from models import AnalysisResult
+
 import argparse
 import json
 import os

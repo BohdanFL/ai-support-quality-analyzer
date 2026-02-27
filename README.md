@@ -30,6 +30,7 @@ Run `generate.py` to create a synthetic chat dataset.
 ```bash
 python generate.py --provider gemini --count 10 --output chats.json
 ```
+
 Arguments:
 - `--provider`: `gemini`, `groq`, or `ollama`.
 - `--count`: Number of chats to generate.

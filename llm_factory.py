@@ -8,7 +8,7 @@ def get_llm_provider(provider_type: str, model_name: Optional[str] = None) -> LL
     provider_type = provider_type.lower()
     
     if provider_type == "gemini":
-        return GeminiProvider(model_name=model_name or "gemma-3-27b-it")
+        return GeminiProvider(model_name=model_name or "gemini-2.5-flash")
     elif provider_type == "groq":
         return GroqProvider(model_name=model_name or "llama-3.3-70b-versatile")
     elif provider_type == "ollama":
