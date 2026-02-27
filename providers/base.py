@@ -28,7 +28,24 @@ class LLMProvider(ABC):
                     **kwargs
                 )
             else:
-                response = self.client.chat.completions.create(
+                # For raw generation, some clients need explicit model parameter
+                if "model" not in kwargs and hasattr(self, "model_name"):
+                    kwargs["model"] = self.model_name
+                
+                # Instructor's patched client often contains the original client
+                client_to_use = getattr(self.client, "client", self.client)
+                
+                # For GenAI (Gemini), the API structure is different
+                if self.name() == "gemini":
+                    # Gemini instructor uses a different structure
+                    response = client_to_use.models.generate_content(
+                        model=kwargs["model"],
+                        contents=prompt, # Simplified for demo/verification
+                        config=kwargs.get("config")
+                    )
+                    return response.text
+                
+                response = client_to_use.chat.completions.create(
                     messages=messages,
                     **kwargs
                 )

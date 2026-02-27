@@ -21,7 +21,10 @@ class GeminiProvider(LLMProvider):
         self.model_name = model_name
 
     def _get_generation_kwargs(self) -> dict:
-        return {"model": self.model_name}
+        return {
+            "model": self.model_name,
+            "config": {"temperature": 0}
+        }
 
     def name(self) -> str:
         return "gemini"

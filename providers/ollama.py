@@ -17,7 +17,10 @@ class OllamaProvider(LLMProvider):
         )
 
     def _get_generation_kwargs(self) -> dict:
-        return {"temperature": 0.2}
+        return {
+            "temperature": 0,
+            "seed": 42
+        }
 
     def name(self) -> str:
         return "ollama"
