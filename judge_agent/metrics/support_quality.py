@@ -1,5 +1,5 @@
-from typing import List, Dict, Any, Literal, Optional
-from pydantic import ValidationError
+from typing import List, Dict, Any, Literal, Optional, Type
+from pydantic import ValidationError, BaseModel
 from judge_agent.models import SupportEvaluationResult
 from judge_agent.metrics.metrics_base import Metric
 
@@ -10,8 +10,8 @@ class SupportQualityMetric(Metric):
         return "support_quality_analysis"
 
     @property
-    def response_schema(self) -> Optional[Dict[str, Any]]:
-        return SupportEvaluationResult.model_json_schema()
+    def response_model(self) -> Optional[Type[BaseModel]]:
+        return SupportEvaluationResult
 
     def build_prompt(self, dialogue: str) -> str:
         return f"""
@@ -35,21 +35,21 @@ class SupportQualityMetric(Metric):
            If there are no mistakes, return ["none"].
         5. rationale - provide a brief (1-2 sentences) explanation.
 
-        Return a VALID JSON object with these EXACT keys: "intent", "satisfaction", "quality_score", "agent_mistakes", "rationale".
+        Return a VALID JSON object matching the requested schema exactly.
         """
 
-    def parse_response(self, response: str) -> Dict[str, Any]:
+    def parse_response(self, response: Any) -> Dict[str, Any]:
         try:
-            clean_response = response.strip().strip("`").removeprefix("json").strip()
+            if isinstance(response, SupportEvaluationResult):
+                return response.model_dump()
             
-            raw_dict = json.loads(clean_response)
+            return {
+                "error": "Failed to receive a valid response object",
+                "raw_response": str(response)
+            }
             
-            validated_data = SupportEvaluationResult(**raw_dict)
-            return validated_data.model_dump()
-            
-        except (json.JSONDecodeError, ValidationError) as e:
+        except ValidationError as e:
             return {
                 "error": "Failed to parse or validate LLM response",
-                "details": str(e),
-                "raw_response": response
+                "details": str(e)
             }

@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Type
+from pydantic import BaseModel
 
 class Metric(ABC):
     @property
@@ -8,7 +9,7 @@ class Metric(ABC):
         pass
 
     @property
-    def response_schema(self) -> Optional[Dict[str, Any]]:
+    def response_model(self) -> Optional[Type[BaseModel]]:
         return None
 
     @abstractmethod
@@ -16,5 +17,5 @@ class Metric(ABC):
         pass
 
     @abstractmethod
-    def parse_response(self, response: str) -> Dict[str, Any]:
+    def parse_response(self, response: Any) -> Dict[str, Any]:
         pass

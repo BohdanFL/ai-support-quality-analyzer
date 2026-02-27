@@ -4,3 +4,7 @@ pydantic
 python-dotenv
 requests
 ollama
+instructor
+instructor[groq]
+instructor[google-genai]
+openai
