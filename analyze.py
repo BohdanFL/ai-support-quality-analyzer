@@ -6,7 +6,6 @@ import os
 from typing import Dict
 
 from judge_agent.evaluation_agent import LLMJudge
-from judge_agent.metrics.support_quality import SupportQualityMetric
 
 def analyze_chat(judge: LLMJudge, chat_data: Dict) -> Dict:
     # Convert chat messages to a readable string for the judge
@@ -40,8 +39,7 @@ def main():
     provider = get_llm_provider(args.provider)
     
     # Initialize the Judge with metrics
-    metrics = [SupportQualityMetric()]
-    judge = LLMJudge(provider=provider, metrics=metrics)
+    judge = LLMJudge(provider=provider)
     
     results = []
     
