@@ -40,11 +40,18 @@ class LLMProvider(ABC):
         messages.append({"role": "user", "content": current_prompt})
         kwargs = self._get_generation_kwargs()
 
+        def before_retry_log(retry_state):
+            logger.warning(
+                f"Retry attempt {retry_state.attempt_number} for {self.name()}... "
+                f"Waiting {retry_state.next_action.sleep:.2f}s before next try. "
+                f"Triggered by: {retry_state.outcome.exception()}"
+            )
+
         # Inner function to be wrapped by tenacity
         @retry(
             stop=stop_after_attempt(5),
             wait=wait_exponential(multiplier=1, min=4, max=60),
-            before_sleep=before_sleep_log(logger, logging.WARNING),
+            before_sleep=before_retry_log,
             reraise=True
         )
         def _execute_generation():
@@ -52,6 +59,7 @@ class LLMProvider(ABC):
                 return self.client.chat.completions.create(
                     messages=messages,
                     response_model=response_model,
+                    max_retries=3,
                     **kwargs
                 )
             else:
@@ -71,6 +79,7 @@ class LLMProvider(ABC):
                 
                 response = client_to_use.chat.completions.create(
                     messages=messages,
+                    max_retries=3,
                     **kwargs
                 )
                 return response.choices[0].message.content

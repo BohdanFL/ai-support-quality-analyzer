@@ -5,6 +5,13 @@ from typing import List, Dict, Any
 from llm_factory import get_llm_provider
 from judge_agent.models import SupportChat
 import random
+import logging
+
+# Configure logging to show retry attempts from tenacity
+logging.basicConfig(
+    level=logging.WARNING,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 
 # Constants
 DEFAULT_OUTPUT_PATH = "data/generated_chats.json"
@@ -160,6 +167,7 @@ def generate_chat(provider, scenario: str, case_type: str) -> Dict[str, Any]:
     return chat_dict
 
 def main():
+    logging.warning("Logging system active. If you see retries, they will appear below.")
     parser = argparse.ArgumentParser(description="Generate support chat dataset")
     parser.add_argument("--provider", type=str, default="gemini", help="LLM provider (gemini, groq, ollama)")
     parser.add_argument("--count", type=int, default=5, help="Number of chats to generate")
