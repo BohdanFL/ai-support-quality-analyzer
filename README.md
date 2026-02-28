@@ -31,13 +31,13 @@ This project implements a synthetic data generation and analysis pipeline for cu
 
     ### Build the Build and Start Containers:
 
-    # Start with Ollama (local models)
+    Start with Ollama (local models)
 
     ```bash
     docker-compose up -d --build
     ```
 
-    # Start without Ollama (with API keys)
+    Start without Ollama (with API keys)
 
     ```bash
     docker-compose --profile without-ollama up -d --build
