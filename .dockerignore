@@ -1,13 +1,10 @@
 # Змінні оточення (НІКОЛИ не копіювати в образ!)
-.env
 .env.local
 .env.*.local
-*.env
 
 # Віртуальне оточення Python
 venv
 env
-.env/
 .venv
 ENV/
 env.bak/
