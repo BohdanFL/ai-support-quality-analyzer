@@ -18,9 +18,16 @@ class Message(BaseModel):
 
 # --- Generation Models ---
 
+class GenerationMetadata(BaseModel):
+    agent_persona: str
+    customer_persona: str
+    is_hidden_dissatisfaction: bool
+    intended_mistakes: List[str]
+
 class SupportChat(BaseModel):
     scenario: request_intent
     type: str = Field(description="The behavior case type (e.g., successful, hidden dissatisfaction)")
+    metadata: Optional[GenerationMetadata] = Field(default=None, description="Metadata about the generation (personas, intended mistakes, etc.)")
     messages: List[Message]
 
 # --- Analysis Models ---
@@ -38,6 +45,14 @@ class SupportEvaluationResult(BaseModel):
     )
     intent: request_intent = Field(
         description="Client's request category. If none fits return 'other'."
+    intent: Literal[
+        "payment_troubles", 
+        "technical_errors", 
+        "account_access", 
+        "tariff_questions", 
+        "refund"
+    ] = Field(
+        description="Client's request category."
     )
     satisfaction: Literal["satisfied", "neutral", "unsatisfied"] = Field(
         description="Level of satisfaction of the client at the end of the communication. Unsatisfied client demonstrates ungratefulness and anger."

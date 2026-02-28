@@ -7,4 +7,4 @@ ollama
 instructor
 instructor[groq]
 instructor[google-genai]
-openai
+tenacity

@@ -14,11 +14,11 @@ class GeminiProvider(LLMProvider):
         if not api_key:
             raise ValueError("GEMINI_API_KEY not found in environment variables")
         
+        self.model_name = model_name
         self.client = instructor.from_genai(
             genai.Client(api_key=api_key),
             mode=instructor.Mode.GENAI_STRUCTURED_OUTPUTS,
         )
-        self.model_name = model_name
 
     def _get_generation_kwargs(self) -> dict:
         return {
