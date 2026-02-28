@@ -12,145 +12,106 @@ This project implements a synthetic data generation and analysis pipeline for cu
 ## Setup
 
 1. **Install dependencies**:
-
-    ```bash
-    pip install -r requirements.txt
-    ```
+   ```bash
+   pip install -r requirements.txt
+   ```
 
 2. **Configure API Keys**:
    Copy `.env.example` to `.env` and fill in your keys:
+   ```bash
+   cp .env.example .env
+   ```
+   *Required:* `GEMINI_API_KEY`, `GROQ_API_KEY`.
 
-    ```bash
-    cp .env.example .env
-    ```
+## Quick Start (Local)
 
-    _Required keys_: `GEMINI_API_KEY`, `GROQ_API_KEY`.
-    _For Ollama_: Ensure Ollama is running locally (`http://localhost:11434`).
+If you have your API keys in `.env`, you can run the entire pipeline with default arguments:
 
-3. **Run the script**:
+1. **Generate**: `python generate.py` (Creates `data/generated_chats.json`)
+2. **Analyze**: `python analyze.py` (Creates `data/analysis_results.json`)
+3. **Aggregate**: `python analytics/data_aggregator.py` (Creates `analytics/support_analytics.csv`)
+4. **Dashboard**: `streamlit run analytics/streamlit_dashboard_app.py`
 
-    ### Build the Build and Start Containers:
+---
 
-    Start with Ollama (local models)
-
-    ```bash
-    docker-compose up -d --build
-    ```
-
-    Start without Ollama (with API keys)
-
-    ```bash
-    docker-compose --profile without-ollama up -d --build
-    ```
-
-    ### Verify Containers are Running
-
-    ```bash
-    docker-compose ps -a
-    ```
-
-    ### Download Required AI Model
-
-    ```bash
-    docker exec ollama-server ollama pull llama2
-    ```
-
-    ### You can also pull other models:
-
-    ```bash
-    docker exec ollama-server ollama pull phi3:mini
-    docker exec ollama-server ollama pull mistral
-    docker exec ollama-server ollama pull llama3:8b-instruct-q4_K_M
-    ```
-
-    ### Access Your Application Container
-
-    ```baSH
-    docker exec -it llm_analytics /bin/bash
-    ```
-
-    ### Generate Dataset Inside Container
-
-    ```bash
-    python3 generate.py --provider ollama --count 10 --output /app/output/chats.json
-    ```
-
-    ### Analyze Dataset
-
-    ```bash
-    python analyze.py --provider ollama --input /app/output/chats.json --output /app/output/results.json
-    ```
-
-    ### View Generated Results
-
-    ```bash
-    ls -la output/
-    cat output/chats.json
-    ```
-
-## Usage
+## Detailed Usage
 
 ### 1. Generate Dataset
 
 Run `generate.py` to create a synthetic chat dataset.
 
 ```bash
-python generate.py --provider groq --model llama-4-scout-17b-16e-instruct --count 10 --output chats.json
+# Using defaults (Gemini, 5 chats, output to data/generated_chats.json)
+python generate.py
+
+# Custom run
+python generate.py --provider groq --count 10 --output data/chats.json
 ```
 
-Arguments:
-
-- `--provider`: `gemini`, `groq`, or `ollama`.
+**Arguments:**
+- `--provider`: `gemini` (default), `groq`, or `ollama`.
 - `--model`: (Optional) Specific model ID (e.g., `gemini-2.5-flash-lite`, `llama-3.3-70b-versatile`).
-- `--count`: Number of chats to generate.
-- `--output`: Filepath to save the results.
-- `--matrix`: (Flag) Generate a full matrix of all intent/case-type combinations.
+- `--count`: Number of chats to generate (default: 5).
+- `--output`: Filepath to save the results (default: `data/generated_chats.json`).
+- `--matrix`: (Flag) Generate a full matrix of all intent/case-type combinations defined in `config.py`.
 
 ### 2. Analyze Dataset
 
 Run `analyze.py` to evaluate the generated chats.
 
 ```bash
-python analyze.py --provider groq --model llama-3.3-70b-versatile --input data/chats.json --output results.json
+# Using defaults (Gemini, input from data/generated_chats.json)
+python analyze.py
+
+# Custom run
+python analyze.py --provider groq --input data/chats.json --output data/results.json
 ```
 
-Arguments:
-
-- `--provider`: LLM provider for analysis (`gemini`, `groq`, `ollama`).
+**Arguments:**
+- `--provider`: LLM provider for analysis (default: `gemini`).
 - `--model`: (Optional) Specific model ID.
-- `--input`: Path to the generated dataset (e.g., `data/generated_chats.json`).
-- `--output`: Filepath for the analysis results (e.g., `analysis_results.json`, will be saved in `data/`).
+- `--input`: Path to the generated dataset (default: `data/generated_chats.json`).
+- `--output`: Filepath for the analysis results (default: `data/analysis_results.json`).
 
 ### 3. Business Intelligence & Analytics
 
-Run the aggregator from the root:
+Aggregate the JSON results into a CSV for the dashboard:
 
 ```bash
-python analytics/data_aggregator.py --chats data/chats.json --results data/results.json --output analytics/support_analytics.csv
+# Using defaults
+python analytics/data_aggregator.py
 ```
 
-Arguments:
-- `--chats`: (Default: `data/generated_chats.json`) Input JSON with generated chats.
-- `--results`: (Default: `data/analysis_results.json`) Input JSON with analysis results.
-- `--output`: (Default: `analytics/support_analytics.csv`) Output CSV path.
+**Arguments:**
+- `--chats`: (Default: `data/generated_chats.json`)
+- `--results`: (Default: `data/analysis_results.json`)
+- `--output`: (Default: `analytics/support_analytics.csv`)
 
-The script creates a CSV file that is used by the dashboard. You can also specify the CSV path directly in the Streamlit UI.
+### 4. Interactive Dashboard
+
+Review the results visually:
 
 ```bash
 streamlit run analytics/streamlit_dashboard_app.py
 ```
 
-This will:
+---
 
-- Start a local web server
-- Automatically open your browser to `http://localhost:8501`
-- Load and display the analytics data
-  Access the Dashboard
+## Docker Support
 
-If the browser doesn't open automatically, navigate to:
+If you prefer using Docker (especially for local Ollama models):
 
-- Local URL: `http://localhost:8501`
-- Network URL: `http://192.168.1.xxx:8501` (for other devices on your network)
+1. **Start Containers**:
+   ```bash
+   docker-compose up -d --build
+   ```
+
+2. **Run Pipeline inside Container**:
+   ```bash
+   docker exec -it llm_analytics python3 generate.py --provider ollama
+   docker exec -it llm_analytics python3 analyze.py --provider ollama
+   docker exec -it llm_analytics python3 analytics/data_aggregator.py
+   ```
 
 ## Project Structure
 
