@@ -17,7 +17,7 @@ class LLMJudge:
 
     def get_analysis_prompt(self, dialogue: str):
         prompt = Path(f"prompts/{self.prompt_filename}").read_text(encoding="utf-8")
-        return prompt.format(dialogue=dialogue)
+        return prompt.replace("{dialogue}", dialogue)
     
     def parse_response(self, response: Any) -> Dict[str, Any]:
         try:

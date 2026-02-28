@@ -170,13 +170,14 @@ def main():
     logging.warning("Logging system active. If you see retries, they will appear below.")
     parser = argparse.ArgumentParser(description="Generate support chat dataset")
     parser.add_argument("--provider", type=str, default="gemini", help="LLM provider (gemini, groq, ollama)")
+    parser.add_argument("--model", type=str, help="Specific model name to use")
     parser.add_argument("--count", type=int, default=5, help="Number of chats to generate")
     parser.add_argument("--output", type=str, default=DEFAULT_OUTPUT_PATH, help="Output file")
     parser.add_argument("--matrix", action="store_true", help="Generate matrix (one for each intent/case_type combination)")
     
     args = parser.parse_args()
     
-    provider = get_llm_provider(args.provider)
+    provider = get_llm_provider(args.provider, model_name=args.model)
     
     dataset = []
     if os.path.exists(args.output):

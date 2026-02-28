@@ -24,6 +24,7 @@ def analyze_chat(judge: LLMJudge, chat_data: Dict) -> Dict:
 def main():
     parser = argparse.ArgumentParser(description="Analyze support chat dataset")
     parser.add_argument("--provider", type=str, default="gemini", help="LLM provider (gemini, groq, ollama)")
+    parser.add_argument("--model", type=str, help="Specific model name to use")
     parser.add_argument("--input", type=str, default="generated_chats.json", help="Input JSON file")
     parser.add_argument("--output", type=str, default="analysis_results.json", help="Output JSON file")
     
@@ -36,7 +37,7 @@ def main():
     with open(args.input, "r", encoding="utf-8") as f:
         dataset = json.load(f)
         
-    provider = get_llm_provider(args.provider)
+    provider = get_llm_provider(args.provider, model_name=args.model)
     
     # Initialize the Judge with metrics
     judge = LLMJudge(provider=provider)
