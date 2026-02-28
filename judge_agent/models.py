@@ -36,6 +36,16 @@ class SupportChat(BaseModel):
 # --- Analysis Models ---
 
 class SupportEvaluationResult(BaseModel):
+    # It is mandatory for thought process to be the first thing LLM does before moving on to
+    # the next components of answer
+    thought_process: str = Field(
+        description=(
+            "Think step-by-step. First, analyze the client's initial request. "
+            "Second, evaluate how the agent handled it. "
+            "Third, identify any specific mistakes the agent made. "
+            "Finally, conclude what the quality score should be."
+        )
+    )
     intent: request_intent = Field(
         description="Client's request category. If none fits return 'other'."
     )
@@ -56,21 +66,3 @@ class SupportEvaluationResult(BaseModel):
     ]] = Field(
         description="List of support's mistakes. If there are none, return ['none']."
     )
-    rationale: str = Field(
-        description="Brief (1-2 sentences) explanation on why such rate was given."
-    )
-
-    @field_validator("intent", "satisfaction", mode="before")
-    @classmethod
-    def normalize_fields(cls, v: str) -> str:
-        if not isinstance(v, str):
-            return v
-        v = v.lower().replace(" ", "_")
-        return v
-
-    @field_validator("agent_mistakes", mode="before")
-    @classmethod
-    def normalize_mistakes(cls, v: Any) -> List[str]:
-        if isinstance(v, str): v = [v]
-        if not isinstance(v, list): return v
-        return [i.lower() for i in v if isinstance(i, str)]
