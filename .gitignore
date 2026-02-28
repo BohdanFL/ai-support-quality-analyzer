@@ -2,8 +2,8 @@ __pycache__/
 *.pyc
 .env
 results/
-data/
+data/tests/
 .vscode/
 *.pdf
 venv/
-.env/
+.env

@@ -16,10 +16,10 @@ def get_llm_provider(provider_type: str, model_name: Optional[str] = None) -> LL
         model_name = OLLAMA_MODEL
         
     if provider_type == "gemini":
-        return GeminiProvider(model_name=model_name or "gemini-2.5-flash")
+        return GeminiProvider(model_name=model_name or os.getenv("GEMINI_MODEL", "gemini-1.5-flash"))
     elif provider_type == "groq":
-        return GroqProvider(model_name=model_name or "llama-3.3-70b-versatile")
+        return GroqProvider(model_name=model_name or os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile"))
     elif provider_type == "ollama":
-        return OllamaProvider(model_name=model_name or "llama2")
+        return OllamaProvider(model_name=model_name or os.getenv("OLLAMA_MODEL", "llama3.2"))
     else:
         raise ValueError(f"Unknown provider type: {provider_type}")

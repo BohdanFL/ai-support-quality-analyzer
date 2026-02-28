@@ -1,5 +1,14 @@
-from pydantic import BaseModel, Field, field_validator
-from typing import List, Literal, Optional, Any
+from pydantic import BaseModel, Field, field_validator, computed_field
+from typing import List, Literal, Any, Optional
+
+request_intent = Literal[
+    "payment_troubles",
+    "technical_errors",
+    "account_access",
+    "tariff_questions",
+    "refund",
+    "other"
+]
 
 # --- Base Models ---
 
@@ -9,43 +18,36 @@ class Message(BaseModel):
 
 # --- Generation Models ---
 
-class SupportChat(BaseModel):
-    scenario: Literal[
-        "payment_troubles",
-        "technical_errors",
-        "account_access",
-        "tariff_questions",
-        "refund",
-        "other"
-    ]
-    type: str = Field(description="The behavior case type (e.g., successful, hidden dissatisfaction)")
-    messages: List[Message]
+class GenerationMetadata(BaseModel):
+    agent_persona: str
+    customer_persona: str
+    is_hidden_dissatisfaction: bool
+    intended_mistakes: List[str]
 
-    @field_validator("scenario", mode="before")
-    @classmethod
-    def normalize_scenario(cls, v: str) -> str:
-        if not isinstance(v, str):
-            return v
-        v = v.lower().replace(" ", "_")
-        if v == "payment_issues": return "payment_troubles"
-        if v == "refund_requests": return "refund"
-        return v
+class SupportChat(BaseModel):
+    scenario: request_intent
+    type: str = Field(description="The behavior case type (e.g., successful, hidden dissatisfaction)")
+    metadata: Optional[GenerationMetadata] = Field(default=None, description="Metadata about the generation (personas, intended mistakes, etc.)")
+    messages: List[Message]
 
 # --- Analysis Models ---
 
 class SupportEvaluationResult(BaseModel):
-    intent: Literal[
-        "payment_troubles", 
-        "technical_errors", 
-        "account_access", 
-        "tariff_questions", 
-        "refund", 
-        "other"
-    ] = Field(
+    # It is mandatory for thought process to be the first thing LLM does before moving on to
+    # the next components of answer
+    thought_process: str = Field(
+        description=(
+            "Think step-by-step. First, analyze the client's initial request. "
+            "Second, evaluate how the agent handled it. "
+            "Third, identify any specific mistakes the agent made. "
+            "Finally, conclude what the quality score should be."
+        )
+    )
+    intent: request_intent = Field(
         description="Client's request category. If none fits return 'other'."
     )
     satisfaction: Literal["satisfied", "neutral", "unsatisfied"] = Field(
-        description="Level of satisfaction of the client at the end of the communication."
+        description="Level of satisfaction of the client at the end of the communication. Unsatisfied client demonstrates ungratefulness and anger."
     )
     quality_score: int = Field(
         ge=1, le=5, 
@@ -61,21 +63,10 @@ class SupportEvaluationResult(BaseModel):
     ]] = Field(
         description="List of support's mistakes. If there are none, return ['none']."
     )
-    rationale: str = Field(
-        description="Brief (1-2 sentences) explanation on why such rate was given."
+    is_problem_solved: bool = Field(
+        description="Define if problem requested in intent was solved by the end of the chat."
     )
 
-    @field_validator("intent", "satisfaction", mode="before")
-    @classmethod
-    def normalize_fields(cls, v: str) -> str:
-        if not isinstance(v, str):
-            return v
-        v = v.lower().replace(" ", "_")
-        return v
-
-    @field_validator("agent_mistakes", mode="before")
-    @classmethod
-    def normalize_mistakes(cls, v: Any) -> List[str]:
-        if isinstance(v, str): v = [v]
-        if not isinstance(v, list): return v
-        return [i.lower() for i in v if isinstance(i, str)]
+    @computed_field
+    def hidden_unsatisfaction(self) -> bool:
+        return not self.is_problem_solved and self.satisfaction != "unsatisfied"

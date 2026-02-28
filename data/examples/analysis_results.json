@@ -1,0 +1,23 @@
+[
+  {
+    "intent": "technical_errors",
+    "satisfaction": "satisfied",
+    "quality_score": 5,
+    "agent_mistakes": ["none"],
+    "rationale": "The agent quickly identified the server issue, provided a clear solution (clearing cache), and the problem was resolved to the client's satisfaction."
+  },
+  {
+    "intent": "refund",
+    "satisfaction": "unsatisfied",
+    "quality_score": 1,
+    "agent_mistakes": ["rude_tone", "no_resolution"],
+    "rationale": "The agent was unprofessional and dismissive. They failed to offer any help or escalate the refund request, leading to a negative customer experience."
+  },
+  {
+    "intent": "account_access",
+    "satisfaction": "unsatisfied",
+    "quality_score": 2,
+    "agent_mistakes": ["no_resolution"],
+    "rationale": "The client left with 'hidden dissatisfaction'. While they said 'thanks', their core problem (losing 2FA access) was not resolved, and the agent didn't offer any alternative verification methods."
+  }
+]

@@ -3,10 +3,9 @@ from llm_factory import get_llm_provider
 import argparse
 import json
 import os
-from typing import List, Dict, Optional
+from typing import Dict
 
 from judge_agent.evaluation_agent import LLMJudge
-from judge_agent.metrics.support_quality import SupportQualityMetric
 
 def analyze_chat(judge: LLMJudge, chat_data: Dict) -> Dict:
     # Convert chat messages to a readable string for the judge
@@ -40,8 +39,7 @@ def main():
     provider = get_llm_provider(args.provider)
     
     # Initialize the Judge with metrics
-    metrics = [SupportQualityMetric()]
-    judge = LLMJudge(provider=provider, metrics=metrics)
+    judge = LLMJudge(provider=provider)
     
     results = []
     
@@ -62,7 +60,7 @@ def main():
             "analysis": analysis
         })
         
-    with open(args.output, "w", encoding="utf-8") as f:
+    with open("data/" + args.output, "w", encoding="utf-8") as f:
         json.dump(results, f, ensure_ascii=False, indent=2)
         
     print(f"Successfully saved analysis results to {args.output}")
