@@ -95,46 +95,49 @@ This project implements a synthetic data generation and analysis pipeline for cu
 Run `generate.py` to create a synthetic chat dataset.
 
 ```bash
-python generate.py --provider gemini --count 10 --output chats.json
+python generate.py --provider groq --model llama-4-scout-17b-16e-instruct --count 10 --output chats.json
 ```
 
 Arguments:
 
 - `--provider`: `gemini`, `groq`, or `ollama`.
+- `--model`: (Optional) Specific model ID (e.g., `gemini-2.5-flash-lite`, `llama-3.3-70b-versatile`).
 - `--count`: Number of chats to generate.
 - `--output`: Filepath to save the results.
+- `--matrix`: (Flag) Generate a full matrix of all intent/case-type combinations.
 
 ### 2. Analyze Dataset
 
 Run `analyze.py` to evaluate the generated chats.
 
 ```bash
-python analyze.py --provider gemini --input chats.json --output results.json
+python analyze.py --provider groq --model llama-3.3-70b-versatile --input data/chats.json --output results.json
 ```
 
 Arguments:
 
-- `--provider`: LLM used for analysis.
-- `--input`: Path to the generated dataset.
-- `--output`: Filepath for the analysis results.
+- `--provider`: LLM provider for analysis (`gemini`, `groq`, `ollama`).
+- `--model`: (Optional) Specific model ID.
+- `--input`: Path to the generated dataset (e.g., `data/generated_chats.json`).
+- `--output`: Filepath for the analysis results (e.g., `analysis_results.json`, will be saved in `data/`).
 
 ### 3. Business Intelligence & Analytics
 
-Run the aggregator with default file names **(Works in container)**:
+Run the aggregator from the root:
 
 ```bash
-python data_aggregator.py
+python analytics/data_aggregator.py
 ```
 
 This expects:
 
-- generated_chats.json - Your chat dataset
-- analysis_results.json - Your analysis results
+- `data/generated_chats.json` - Your chat dataset
+- `data/analysis_results.json` - Your analysis results
 
-Script creates support\*analytics.csv that will be used in streamlit_dashboard_app.py for visualizing and exploring support chat analytics in Streamlit Dashboard **(Doesn't work in container)**.
+The script creates `analytics/support_analytics.csv` which is used by the dashboard.
 
 ```bash
-streamlit run streamlit_dashboard_app.py
+streamlit run analytics/streamlit_dashboard_app.py
 ```
 
 This will:
@@ -151,7 +154,16 @@ If the browser doesn't open automatically, navigate to:
 
 ## Project Structure
 
-- `providers/`: LLM adapter implementations.
-- `llm_factory.py`: Factory for switching providers.
-- `generate.py`: Main script for data generation.
-- `analyze.py`: Main script for data analysis.
+- `providers/`: LLM adapter implementations (Gemini, Groq, Ollama).
+- `judge_agent/`: Core analysis logic.
+  - `config.py`: Central configuration for personas, intents, and behavior types.
+  - `evaluation_agent.py`: Implementation of the AI evaluation logic.
+  - `models.py`: Pydantic data models for structured LLM input/output.
+- `prompts/`: Template library for system prompts and evaluation metrics.
+- `analytics/`: Business intelligence tools.
+  - `data_aggregator.py`: Script to merge chats and analysis into a CSV.
+  - `streamlit_dashboard_app.py`: Interactive dashboard for visualizing results.
+- `data/`: Storage for generated datasets and analysis results.
+- `llm_factory.py`: Central factory to switch between LLM providers.
+- `generate.py`: Entry point for synthetic chat generation.
+- `analyze.py`: Entry point for automated quality analysis.
