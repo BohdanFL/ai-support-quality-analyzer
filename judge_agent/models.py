@@ -1,6 +1,15 @@
 from pydantic import BaseModel, Field, field_validator
 from typing import List, Literal, Any
 
+request_intent = Literal[
+    "payment_troubles",
+    "technical_errors",
+    "account_access",
+    "tariff_questions",
+    "refund",
+    "other"
+]
+
 # --- Base Models ---
 
 class Message(BaseModel):
@@ -10,14 +19,7 @@ class Message(BaseModel):
 # --- Generation Models ---
 
 class SupportChat(BaseModel):
-    scenario: Literal[
-        "payment_troubles",
-        "technical_errors",
-        "account_access",
-        "tariff_questions",
-        "refund",
-        "other"
-    ]
+    scenario: request_intent
     type: str = Field(description="The behavior case type (e.g., successful, hidden dissatisfaction)")
     messages: List[Message]
 
@@ -34,14 +36,7 @@ class SupportChat(BaseModel):
 # --- Analysis Models ---
 
 class SupportEvaluationResult(BaseModel):
-    intent: Literal[
-        "payment_troubles", 
-        "technical_errors", 
-        "account_access", 
-        "tariff_questions", 
-        "refund", 
-        "other"
-    ] = Field(
+    intent: request_intent = Field(
         description="Client's request category. If none fits return 'other'."
     )
     satisfaction: Literal["satisfied", "neutral", "unsatisfied"] = Field(

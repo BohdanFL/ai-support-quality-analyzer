@@ -4,6 +4,7 @@ from judge_agent.metrics.metrics_base import Metric
 from judge_agent.metrics.support_quality import SupportQualityMetric
 from providers.base import LLMProvider
 from providers.gemini import GeminiProvider
+from pathlib import Path
 
 class LLMJudge:
     def __init__(self, provider: LLMProvider, metrics: List[Metric]):
@@ -16,8 +17,6 @@ class LLMJudge:
             prompt = metric.build_prompt(dialogue)
             print("Sending prompt:")
             print(prompt)
-            print("Sending schema:")
-            print(metric.response_schema)
             print("\nSending to LLM...")
             llm_response = self.provider.generate(prompt, response_schema=metric.response_schema)
             print("LLM response:")
@@ -29,12 +28,9 @@ class LLMJudge:
         return evaluation_results
 
 if __name__ == "__main__":
-    sample_dialogue = """
-    Клієнт: Привіт! Я вчора скасував підписку, але гроші все одно зняло. Коли буде повернення?
-    Агент: Вітаю! Ваша підписка вже скасована. Гарного дня!
-    Клієнт: Але ж ви зняли гроші! Коли вони повернуться на картку??
-    Агент: Підписка не активна. До побачення.
-    """
+    prompt_filename = "./prompts/sample_dialogue.md"
+
+    sample_dialogue = Path(f"prompts/{prompt_filename}").read_text(encoding="utf-8")
 
     provider = GeminiProvider()
 
