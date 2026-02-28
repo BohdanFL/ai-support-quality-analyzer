@@ -104,6 +104,37 @@ Arguments:
 - `--input`: Path to the generated dataset.
 - `--output`: Filepath for the analysis results.
 
+### 3. Business Intelligence & Analytics
+
+Run the aggregator with default file names:
+
+```bash
+python data_aggregator.py
+```
+
+This expects:
+
+- generated_chats.json - Your chat dataset
+- analysis_results.json - Your analysis results
+
+Script creates support_analytics.csv that will be used in streamlit_dashboard_app.py for visualizing and exploring support chat analytics in Streamlit Dashboard.
+
+```bash
+streamlit run streamlit_dashboard_app.py
+```
+
+This will:
+
+- Start a local web server
+- Automatically open your browser to `http://localhost:8501`
+- Load and display the analytics data
+  Access the Dashboard
+
+If the browser doesn't open automatically, navigate to:
+
+- Local URL: `http://localhost:8501`
+- Network URL: `http://192.168.1.xxx:8501` (for other devices on your network)
+
 ## Project Structure
 
 - `providers/`: LLM adapter implementations.

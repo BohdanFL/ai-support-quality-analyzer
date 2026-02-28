@@ -2,7 +2,7 @@ from typing import List, Dict, Any, Literal, Optional
 from pydantic import ValidationError
 from judge_agent.models import SupportEvaluationResult
 from judge_agent.metrics.metrics_base import Metric
-
+import json
 
 class SupportQualityMetric(Metric):
     @property

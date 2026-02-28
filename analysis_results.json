@@ -1,0 +1,337 @@
+[
+    {
+        "chat_id": 2,
+        "original_chat": {
+            "scenario": "refund_request",
+            "type": "successful case",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": "I was charged twice for my annual renewal. Can I get a refund for the second charge?"
+                },
+                {
+                    "role": "assistant",
+                    "content": "I'm sorry to hear that! I can definitely check that for you. May I have your account email?"
+                },
+                { "role": "user", "content": "It's alex.p@email.com." },
+                {
+                    "role": "assistant",
+                    "content": "I see the duplicate transaction. I have initiated a refund for the extra $99.99. It should appear in your account within 5-7 business days."
+                },
+                { "role": "user", "content": "That was easy, thanks!" }
+            ]
+        },
+        "analysis": {
+            "intent": "refund_request",
+            "satisfaction": "satisfied",
+            "quality_score": 5,
+            "agent_mistakes": ["none"],
+            "rationale": "Agent identified the double charge immediately and processed the refund without friction."
+        }
+    },
+    {
+        "chat_id": 3,
+        "original_chat": {
+            "scenario": "technical_bug",
+            "type": "frustrated case",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": "The app keeps crashing when I try to upload a PDF. This is the third time today!"
+                },
+                {
+                    "role": "assistant",
+                    "content": "Hello. Have you tried turning your phone off and on again?"
+                },
+                {
+                    "role": "user",
+                    "content": "Yes, obviously. I've also reinstalled the app. It's still broken."
+                },
+                {
+                    "role": "assistant",
+                    "content": "I see. Please wait while I look into this... I don't see any server issues. Maybe your file is too big?"
+                },
+                {
+                    "role": "user",
+                    "content": "It's only 2MB. You guys aren't helping at all."
+                }
+            ]
+        },
+        "analysis": {
+            "intent": "technical_bug",
+            "satisfaction": "unsatisfied",
+            "quality_score": 2,
+            "agent_mistakes": ["generic_troubleshooting", "lack_of_empathy"],
+            "rationale": "The agent provided 'canned' responses that the user had already tried and failed to offer a technical escalation."
+        }
+    },
+    {
+        "chat_id": 4,
+        "original_chat": {
+            "scenario": "account_access",
+            "type": "successful case",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": "I've lost access to my 2FA device. How can I log in?"
+                },
+                {
+                    "role": "assistant",
+                    "content": "Don't worry, we can help you recover access. I'll need to verify your identity. I've sent a verification code to your recovery email."
+                },
+                { "role": "user", "content": "Got it. The code is 882190." },
+                {
+                    "role": "assistant",
+                    "content": "Verified! I have temporarily disabled 2FA for you. Please log in and set up a new device immediately."
+                },
+                { "role": "user", "content": "Thank you, you saved my day!" }
+            ]
+        },
+        "analysis": {
+            "intent": "account_access",
+            "satisfaction": "satisfied",
+            "quality_score": 5,
+            "agent_mistakes": ["none"],
+            "rationale": "Agent followed security protocols efficiently while maintaining a helpful tone."
+        }
+    },
+    {
+        "chat_id": 5,
+        "original_chat": {
+            "scenario": "feature_inquiry",
+            "type": "neutral case",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": "Does your Pro plan include team collaboration features?"
+                },
+                {
+                    "role": "assistant",
+                    "content": "The Pro plan is mainly for individuals. For teams, you would need the Business plan."
+                },
+                { "role": "user", "content": "What's the price difference?" },
+                {
+                    "role": "assistant",
+                    "content": "Pro is $15/month and Business is $30/user/month. Would you like a link to the comparison table?"
+                },
+                {
+                    "role": "user",
+                    "content": "Yes, please. I'll look at it later."
+                }
+            ]
+        },
+        "analysis": {
+            "intent": "feature_inquiry",
+            "satisfaction": "neutral",
+            "quality_score": 4,
+            "agent_mistakes": ["none"],
+            "rationale": "The agent answered questions accurately but didn't proactively try to sell the benefits of the Business plan."
+        }
+    },
+    {
+        "chat_id": 6,
+        "original_chat": {
+            "scenario": "billing_dispute",
+            "type": "unsuccessful case",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": "I cancelled my sub last month but I was still charged today."
+                },
+                {
+                    "role": "assistant",
+                    "content": "I see a cancellation request, but it wasn't confirmed. Did you click the final link in the email?"
+                },
+                {
+                    "role": "user",
+                    "content": "I didn't get an email. I just clicked cancel on the website."
+                },
+                {
+                    "role": "assistant",
+                    "content": "Our policy states that cancellation is only complete after email confirmation. I cannot refund the current month."
+                },
+                {
+                    "role": "user",
+                    "content": "That is ridiculous. I want to speak to a manager."
+                }
+            ]
+        },
+        "analysis": {
+            "intent": "billing_dispute",
+            "satisfaction": "very_unsatisfied",
+            "quality_score": 1,
+            "agent_mistakes": ["policy_rigidity", "poor_escalation"],
+            "rationale": "Agent hid behind policy instead of resolving a clear UX failure where the user thought they had cancelled."
+        }
+    },
+    {
+        "chat_id": 7,
+        "original_chat": {
+            "scenario": "cancel_subscription",
+            "type": "successful case",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": "I'd like to cancel my subscription effective immediately."
+                },
+                {
+                    "role": "assistant",
+                    "content": "I'm sorry to see you go! May I ask if there was a specific reason or something we could have done better?"
+                },
+                {
+                    "role": "user",
+                    "content": "It's just too expensive for me right now."
+                },
+                {
+                    "role": "assistant",
+                    "content": "I understand. I can offer you a 50% discount for the next 3 months if you'd like to stay?"
+                },
+                {
+                    "role": "user",
+                    "content": "Oh, in that case, I'll keep it. Thanks!"
+                }
+            ]
+        },
+        "analysis": {
+            "intent": "cancel_subscription",
+            "satisfaction": "satisfied",
+            "quality_score": 5,
+            "agent_mistakes": ["none"],
+            "rationale": "Successful retention through a well-timed promotional offer."
+        }
+    },
+    {
+        "chat_id": 8,
+        "original_chat": {
+            "scenario": "wrong_item_received",
+            "type": "successful case",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": "I ordered a blue hoodie but received a red one."
+                },
+                {
+                    "role": "assistant",
+                    "content": "I am so sorry for the mix-up! Please keep the red one as a gift, and I will ship the blue one to you today for free."
+                },
+                {
+                    "role": "user",
+                    "content": "Wow, really? That's amazing. Thank you!"
+                },
+                {
+                    "role": "assistant",
+                    "content": "You're welcome! Your new tracking number will be in your email soon."
+                }
+            ]
+        },
+        "analysis": {
+            "intent": "wrong_item_received",
+            "satisfaction": "very_satisfied",
+            "quality_score": 5,
+            "agent_mistakes": ["none"],
+            "rationale": "Agent went above and beyond to resolve a physical product error."
+        }
+    },
+    {
+        "chat_id": 9,
+        "original_chat": {
+            "scenario": "delivery_status",
+            "type": "neutral case",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": "Where is my order? It was supposed to be here yesterday."
+                },
+                {
+                    "role": "assistant",
+                    "content": "Let me check... it looks like it's delayed due to weather in the sorting hub. It should arrive tomorrow."
+                },
+                {
+                    "role": "user",
+                    "content": "Okay, but will I get a shipping refund since it's late?"
+                },
+                {
+                    "role": "assistant",
+                    "content": "Since it's weather-related, we don't usually refund shipping, but I can give you a $5 credit for your next order."
+                },
+                { "role": "user", "content": "Better than nothing. Thanks." }
+            ]
+        },
+        "analysis": {
+            "intent": "delivery_status",
+            "satisfaction": "neutral",
+            "quality_score": 4,
+            "agent_mistakes": ["none"],
+            "rationale": "Agent explained the delay clearly and offered a small token of goodwill."
+        }
+    },
+    {
+        "chat_id": 10,
+        "original_chat": {
+            "scenario": "password_reset",
+            "type": "successful case",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": "I'm not getting the password reset email."
+                },
+                {
+                    "role": "assistant",
+                    "content": "Please check your spam folder. Sometimes they end up there!"
+                },
+                {
+                    "role": "user",
+                    "content": "I checked, it's not there either."
+                },
+                {
+                    "role": "assistant",
+                    "content": "I've manually triggered a reset link from our backup server. Check now."
+                },
+                { "role": "user", "content": "Got it! It worked. Thanks." }
+            ]
+        },
+        "analysis": {
+            "intent": "password_reset",
+            "satisfaction": "satisfied",
+            "quality_score": 5,
+            "agent_mistakes": ["none"],
+            "rationale": "Agent moved quickly to a secondary solution when the standard method failed."
+        }
+    },
+    {
+        "chat_id": 11,
+        "original_chat": {
+            "scenario": "service_outage",
+            "type": "frustrated case",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": "Is the site down? I can't reach my dashboard."
+                },
+                {
+                    "role": "assistant",
+                    "content": "Everything seems fine on my end. It might be your internet."
+                },
+                {
+                    "role": "user",
+                    "content": "Every other site works. Only yours is failing. Check Twitter, everyone is complaining."
+                },
+                {
+                    "role": "assistant",
+                    "content": "Oh, I see it now. Yes, there is a minor outage. Please wait for it to be fixed."
+                },
+                {
+                    "role": "user",
+                    "content": "A 'minor' outage? I'm losing money here."
+                }
+            ]
+        },
+        "analysis": {
+            "intent": "service_outage",
+            "satisfaction": "unsatisfied",
+            "quality_score": 2,
+            "agent_mistakes": ["dismissive_attitude", "delayed_info"],
+            "rationale": "Agent initially blamed the user's internet before acknowledging a known system-wide issue."
+        }
+    }
+]
