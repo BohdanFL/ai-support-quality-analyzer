@@ -7,14 +7,10 @@ from providers.ollama import OllamaProvider
 from dotenv import load_dotenv
 
 load_dotenv()
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL")
 
 def get_llm_provider(provider_type: str, model_name: Optional[str] = None) -> LLMProvider:
     provider_type = provider_type.lower()
     
-    if model_name is None:
-        model_name = OLLAMA_MODEL
-        
     if provider_type == "gemini":
         return GeminiProvider(model_name=model_name or os.getenv("GEMINI_MODEL", "gemini-1.5-flash"))
     elif provider_type == "groq":

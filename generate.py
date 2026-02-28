@@ -4,6 +4,11 @@ import os
 from typing import List, Dict, Any
 from llm_factory import get_llm_provider
 from judge_agent.models import SupportChat
+from judge_agent.config import (
+    INTENTS, CASE_TYPES, AGENT_PERSONAS, 
+    CUSTOMER_PERSONAS, MISTAKE_TYPES
+)
+from pathlib import Path
 import random
 import logging
 
@@ -15,101 +20,9 @@ logging.basicConfig(
 
 # Constants
 DEFAULT_OUTPUT_PATH = "data/generated_chats.json"
+SYSTEM_PROMPT_PATH = "prompts/generation_system.md"
 
-INTENTS = [
-    "payment_troubles",
-    "technical_errors",
-    "account_access",
-    "tariff_questions",
-    "refund"
-]
-
-CASE_TYPES = [
-    "successful",
-    "problematic",
-    "conflict",
-    "agent_mistake"
-]
-
-AGENT_PERSONAS = [
-    {
-        "name": "Experienced Professional",
-        "description": "Calm, efficient, follows protocol accurately, empathetic but maintains professional boundaries."
-    },
-    {
-        "name": "Impatient Trainee",
-        "description": "Fast but slightly sloppy, relies heavily on canned responses, gets visibly annoyed with long customer explanations."
-    },
-    {
-        "name": "Overly Polite Senior",
-        "description": "Uses extremely formal and flowery language, apologizes excessively for every minor inconvenience, very thorough but perhaps too slow."
-    },
-    {
-        "name": "Strictly-by-the-Book Agent",
-        "description": "Cold, literal, lacks empathy, refuses to deviate from scripts even when they don't apply well to the situation."
-    }
-]
-
-CUSTOMER_PERSONAS = [
-    {
-        "name": "Tech-savvy Millennial",
-        "description": "Impatient with basic troubleshooting steps, wants direct and technical answers, uses modern slang and concise sentences."
-    },
-    {
-        "name": "Elderly Person",
-        "description": "Confused by technical terminology, needs slow and step-by-step explanations, very polite and appreciative of patience."
-    },
-    {
-        "name": "Busy Entrepreneur",
-        "description": "Multitasking and distracted, sends short and urgent messages, gets frustrated by any delays or repeat questions."
-    },
-    {
-        "name": "Angry Student",
-        "description": "Feels entitled and treated unfairly, aggressive and demanding, uses exclamation marks and caps for emphasis."
-    },
-    {
-        "name": "Polite but Persistent Customer",
-        "description": "Extremely detail-oriented, won't end the chat until every single sub-question is answered, very observant of agent's tone."
-    }
-]
-
-MISTAKE_TYPES = [
-    {
-        "name": "ignored_question",
-        "description": "The agent completely ignores one or more specific questions or concerns raised by the customer."
-    },
-    {
-        "name": "incorrect_info",
-        "description": "The agent provides factually wrong information about the product, technical steps, or company policy."
-    },
-    {
-        "name": "rude_tone",
-        "description": "The agent's tone is dismissive, passive-aggressive, or overtly rude to the customer."
-    },
-    {
-        "name": "no_resolution",
-        "description": "The agent ends the interaction without actually solving the customer's primary problem despite saying they are finished."
-    },
-    {
-        "name": "unnecessary_escalation",
-        "description": "The agent transfers the customer to another department for a basic issue they should have been able to handle themselves."
-    }
-]
-
-GENERATION_SYSTEM_PROMPT = """
-You are a synthetic data generator for customer support chats. 
-Your goal is to generate realistic dialogues between a Customer and a Support Agent.
-
-Each dialogue should be a JSON object with:
-- "scenario": The topic of the chat.
-- "type": The specific behavior case (successful, problematic, conflict, or agent_mistake).
-- "metadata": Detailed information about the personalities and intended behaviors.
-- "messages": An array of objects with "role" (user or assistant) and "content".
-
-Make the dialogues feel natural. Support agents should try to be helpful but can make mistakes if specified.
-"""
-
-def generate_chat(provider, scenario: str, case_type: str) -> Dict[str, Any]:
+def generate_chat(provider, scenario: str, case_type: str, system_prompt: str) -> Dict[str, Any]:
     agent_p = random.choice(AGENT_PERSONAS)
     customer_p = random.choice(CUSTOMER_PERSONAS)
     
@@ -155,7 +68,7 @@ def generate_chat(provider, scenario: str, case_type: str) -> Dict[str, Any]:
 
     validated_chat = provider.generate(
         prompt, 
-        system_prompt=GENERATION_SYSTEM_PROMPT,
+        system_prompt=system_prompt,
         response_model=SupportChat
     )
     
@@ -178,6 +91,13 @@ def main():
     args = parser.parse_args()
     
     provider = get_llm_provider(args.provider, model_name=args.model)
+
+    # Load generation system prompt
+    try:
+        system_prompt = Path(SYSTEM_PROMPT_PATH).read_text(encoding="utf-8")
+    except FileNotFoundError:
+        print(f"Error: System prompt file {SYSTEM_PROMPT_PATH} not found.")
+        return
     
     dataset = []
     if os.path.exists(args.output):
@@ -227,7 +147,7 @@ def main():
 
     for i, (intent, case_type) in enumerate(final_pairs):
         print(f"[{i+1}/{len(pairs_to_generate)}] Generating {case_type} for {intent}...")
-        chat = generate_chat(provider, intent, case_type)
+        chat = generate_chat(provider, intent, case_type, system_prompt)
         
         if "error" not in chat:
             dataset.append(chat)
