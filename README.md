@@ -126,7 +126,7 @@ Arguments:
 Run the aggregator from the root:
 
 ```bash
-python analytics/data_aggregator.py --chats data/groq_dataset_300.json --results data/analysis_results.json --output analytics/support_analytics.csv
+python analytics/data_aggregator.py --chats data/chats.json --results data/results.json --output analytics/support_analytics.csv
 ```
 
 Arguments:

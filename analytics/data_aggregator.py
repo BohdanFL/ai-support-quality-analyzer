@@ -1,5 +1,8 @@
 from typing import Dict, List, Any
 import argparse
+import json
+from pathlib import Path
+import pandas as pd
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -38,8 +41,9 @@ class SupportChatAggregator:
         records = []
         
         for i, result_item in enumerate(self.results_data):
-            # Get the analysis data (nested under "analysis")
-            analysis = result_item.get('analysis', {})
+            # Get the analysis data (nested under "analysis" -> "result")
+            analysis_wrapper = result_item.get('analysis', {})
+            analysis = analysis_wrapper.get('result', {})
             original_chat = result_item.get('original_chat', {})
             
             # Basic chat info
@@ -49,11 +53,11 @@ class SupportChatAggregator:
                 'scenario_type': original_chat.get('type', 'unknown'),
                 'message_count': len(original_chat.get('messages', [])),
                 
-                # Analysis results - NOW FROM THE NESTED 'analysis' OBJECT
+                # Analysis results
                 'intent': analysis.get('intent', 'unknown'),
                 'satisfaction': analysis.get('satisfaction', 'unknown'),
                 'quality_score': analysis.get('quality_score', 0),
-                'rationale': analysis.get('rationale', ''),
+                'rationale': analysis.get('thought_process', ''),
                 
                 # Process agent mistakes
                 'has_mistakes': False,
