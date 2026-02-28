@@ -2,8 +2,7 @@ from llm_factory import get_llm_provider
 from judge_agent.models import SupportChat
 import argparse
 import json
-import os
-from typing import List, Dict
+from typing import Dict
 
 # Scenarios as defined in the task
 SCENARIOS = [

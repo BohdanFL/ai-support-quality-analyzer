@@ -3,7 +3,7 @@ from llm_factory import get_llm_provider
 import argparse
 import json
 import os
-from typing import List, Dict, Optional
+from typing import Dict
 
 from judge_agent.evaluation_agent import LLMJudge
 from judge_agent.metrics.support_quality import SupportQualityMetric
