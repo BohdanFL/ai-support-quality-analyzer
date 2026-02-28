@@ -15,15 +15,19 @@ st.title("💬 Support Chat Quality Analytics")
 st.markdown("Аналіз якості підтримки клієнтів")
 
 @st.cache_data
-def load_data():
+def load_data(file_path):
     try:
-        df = pd.read_csv('support_analytics.csv')
+        df = pd.read_csv(file_path)
         return df
     except FileNotFoundError:
-        st.error("Файл support_analytics.csv не знайдено. Спочатку запусти data_aggregator.py")
+        st.error(f"Файл {file_path} не знайдено. Спочатку запусти data_aggregator.py")
         return None
 
-df = load_data()
+# Sidebar for file selection
+st.sidebar.header("📁 Налаштування даних")
+csv_path = st.sidebar.text_input("Шлях до CSV файлу", value='analytics/support_analytics.csv')
+
+df = load_data(csv_path)
 
 if df is not None:
     # Бокова панель з фільтрами

@@ -1,9 +1,5 @@
-# data_aggregator.py
-import json
-import pandas as pd
-import numpy as np
-from pathlib import Path
 from typing import Dict, List, Any
+import argparse
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -231,21 +227,37 @@ class SupportChatAggregator:
         return self.df, kpis
 
 
-# Example usage
-if __name__ == "__main__":
+def main():
+    parser = argparse.ArgumentParser(description="Aggregate and process support chat data for analytics")
+    parser.add_argument("--chats", type=str, default="data/generated_chats.json", help="Path to generated chats JSON")
+    parser.add_argument("--results", type=str, default="data/analysis_results.json", help="Path to analysis results JSON")
+    parser.add_argument("--output", type=str, default="analytics/support_analytics.csv", help="Output CSV path")
+    
+    args = parser.parse_args()
+    
+    if not Path(args.chats).exists():
+        print(f"Error: Chats file {args.chats} not found.")
+        return
+    if not Path(args.results).exists():
+        print(f"Error: Results file {args.results} not found.")
+        return
+
     # Initialize aggregator
     aggregator = SupportChatAggregator(
-        chats_path='./data/generated_chats.json',
-        results_path='./data/analysis_results.json'
+        chats_path=args.chats,
+        results_path=args.results
     )
     
     # Run analysis
     df, kpis = aggregator.run_complete_analysis()
     
     # Save processed data
-    aggregator.save_to_csv('support_analytics.csv')
+    aggregator.save_to_csv(args.output)
     
     # Show sample of the data
     print("\n📊 Sample of processed data:")
     if df is not None and not df.empty:
         print(df[['chat_id', 'intent', 'satisfaction', 'quality_score', 'has_mistakes']].head())
+
+if __name__ == "__main__":
+    main()

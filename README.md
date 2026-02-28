@@ -126,15 +126,15 @@ Arguments:
 Run the aggregator from the root:
 
 ```bash
-python analytics/data_aggregator.py
+python analytics/data_aggregator.py --chats data/groq_dataset_300.json --results data/analysis_results.json --output analytics/support_analytics.csv
 ```
 
-This expects:
+Arguments:
+- `--chats`: (Default: `data/generated_chats.json`) Input JSON with generated chats.
+- `--results`: (Default: `data/analysis_results.json`) Input JSON with analysis results.
+- `--output`: (Default: `analytics/support_analytics.csv`) Output CSV path.
 
-- `data/generated_chats.json` - Your chat dataset
-- `data/analysis_results.json` - Your analysis results
-
-The script creates `analytics/support_analytics.csv` which is used by the dashboard.
+The script creates a CSV file that is used by the dashboard. You can also specify the CSV path directly in the Streamlit UI.
 
 ```bash
 streamlit run analytics/streamlit_dashboard_app.py

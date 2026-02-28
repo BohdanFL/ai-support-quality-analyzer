@@ -104,7 +104,8 @@ def main():
         try:
             with open(args.output, "r", encoding="utf-8") as f:
                 dataset = json.load(f)
-        except:
+        except Exception as e:
+            print(f"Warning: Could not load existing dataset for checkpointing: {e}")
             dataset = []
 
     # Checkpointing: count existing (intent, case_type) pairs
@@ -139,11 +140,13 @@ def main():
         print("All requested chats already exist in the output file. Nothing to generate.")
         return
 
-    print(f"Plan to generate {len(final_pairs)} NEW chats using {args.provider} (Skipped {len(pairs_to_generate) - len(final_pairs)} existing matches)...")
-
-    output_dir = os.path.dirname("data/" + args.output)
+    # Ensure output directory exists
+    output_path = args.output
+    output_dir = os.path.dirname(output_path)
     if output_dir:
         os.makedirs(output_dir, exist_ok=True)
+
+    print(f"Plan to generate {len(final_pairs)} NEW chats using {args.provider} (Skipped {len(pairs_to_generate) - len(final_pairs)} existing matches)...")
 
     for i, (intent, case_type) in enumerate(final_pairs):
         print(f"[{i+1}/{len(pairs_to_generate)}] Generating {case_type} for {intent}...")
@@ -152,7 +155,7 @@ def main():
         if "error" not in chat:
             dataset.append(chat)
             # Intermediate save
-            with open("data/" + args.output, "w", encoding="utf-8") as f:
+            with open(output_path, "w", encoding="utf-8") as f:
                 json.dump(dataset, f, ensure_ascii=False, indent=2)
         else:
             print(f"Error generating chat for {intent}: {chat['error']}")

@@ -42,7 +42,24 @@ def main():
     # Initialize the Judge with metrics
     judge = LLMJudge(provider=provider)
     
+    # Ensure output directory exists
+    output_path = args.output
+    output_dir = os.path.dirname(output_path)
+    if output_dir:
+        os.makedirs(output_dir, exist_ok=True)
+
     results = []
+    if os.path.exists(output_path):
+        try:
+            with open(output_path, "r", encoding="utf-8") as f:
+                results = json.load(f)
+            print(f"Loaded {len(results)} existing analysis results.")
+        except Exception as e:
+            print(f"Warning: Could not load existing results for checkpointing: {e}")
+            results = []
+
+    # Identify which chats are already analyzed
+    analyzed_chats_content = [item.get("original_chat") for item in results]
     
     print(f"Analyzing {len(dataset)} chats using {args.provider}...")
     
@@ -51,20 +68,29 @@ def main():
             print(f"[{i+1}/{len(dataset)}] Skipping invalid chat.")
             continue
             
+        # Check if already analyzed
+        if chat in analyzed_chats_content:
+            continue
+
         print(f"[{i+1}/{len(dataset)}] Analyzing chat...")
-        analysis = analyze_chat(judge, chat)
+        try:
+            analysis = analyze_chat(judge, chat)
+            
+            # Combine original chat with its analysis for the final report
+            results.append({
+                "chat_id": i + 1,
+                "original_chat": chat,
+                "analysis": analysis
+            })
+            
+            # Intermediate save
+            with open(output_path, "w", encoding="utf-8") as f:
+                json.dump(results, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            print(f"Error analyzing chat {i+1}: {e}")
+            continue
         
-        # Combine original chat with its analysis for the final report
-        results.append({
-            "chat_id": i + 1,
-            "original_chat": chat,
-            "analysis": analysis
-        })
-        
-    with open("data/" + args.output, "w", encoding="utf-8") as f:
-        json.dump(results, f, ensure_ascii=False, indent=2)
-        
-    print(f"Successfully saved analysis results to {args.output}")
+    print(f"Successfully saved analysis results to {output_path}")
 
 if __name__ == "__main__":
     main()
