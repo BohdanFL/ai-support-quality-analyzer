@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, field_validator, computed_field
-from typing import List, Literal, Any
+from typing import List, Literal, Any, Optional
 
 request_intent = Literal[
     "payment_troubles",
@@ -45,14 +45,6 @@ class SupportEvaluationResult(BaseModel):
     )
     intent: request_intent = Field(
         description="Client's request category. If none fits return 'other'."
-    intent: Literal[
-        "payment_troubles", 
-        "technical_errors", 
-        "account_access", 
-        "tariff_questions", 
-        "refund"
-    ] = Field(
-        description="Client's request category."
     )
     satisfaction: Literal["satisfied", "neutral", "unsatisfied"] = Field(
         description="Level of satisfaction of the client at the end of the communication. Unsatisfied client demonstrates ungratefulness and anger."

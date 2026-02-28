@@ -231,7 +231,7 @@ def main():
         if "error" not in chat:
             dataset.append(chat)
             # Intermediate save
-            with open(args.output, "w", encoding="utf-8") as f:
+            with open("data/" + args.output, "w", encoding="utf-8") as f:
                 json.dump(dataset, f, ensure_ascii=False, indent=2)
         else:
             print(f"Error generating chat for {intent}: {chat['error']}")

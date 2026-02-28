@@ -49,16 +49,3 @@ class LLMJudge:
         evaluation_results["result"] = result
             
         return evaluation_results
-
-if __name__ == "__main__":
-    prompt_filename = "./prompts/sample_dialogue.md"
-
-    sample_dialogue = Path(f"prompts/{prompt_filename}").read_text(encoding="utf-8")
-
-    provider = GeminiProvider()
-
-    judge = LLMJudge(provider=provider)
-
-    result = judge.evaluate_dialogue(sample_dialogue)
-    
-    print(json.dumps(result, indent=4, ensure_ascii=False))
