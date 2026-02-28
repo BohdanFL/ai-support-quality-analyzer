@@ -58,10 +58,10 @@ def generate_chat(provider, scenario: str, case_type: str) -> Dict:
         cleaned_response = cleaned_response[4:].strip()
 
     try:
-        data = json.loads(cleaned_response)
+        # data = json.loads(cleaned_response)
         # Validate with Pydantic
-        validated_chat = SupportChat(**data)
-        return validated_chat.model_dump()
+        # validated_chat = SupportChat(**data)
+        return response_text
     except Exception as e:
         print(f"Error validating/parsing JSON: {str(e)}")
         return {"error": "Failed to parse/validate", "details": str(e), "raw": response_text}

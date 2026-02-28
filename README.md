@@ -31,8 +31,16 @@ This project implements a synthetic data generation and analysis pipeline for cu
 
     ### Build the Build and Start Containers:
 
+    Start with Ollama (local models)
+
     ```bash
     docker-compose up -d --build
+    ```
+
+    Start without Ollama (with API keys)
+
+    ```bash
+    docker-compose --profile without-ollama up -d --build
     ```
 
     ### Verify Containers are Running
@@ -65,6 +73,12 @@ This project implements a synthetic data generation and analysis pipeline for cu
 
     ```bash
     python3 generate.py --provider ollama --count 10 --output /app/output/chats.json
+    ```
+
+    ### Analyze Dataset
+
+    ```bash
+    python analyze.py --provider ollama --input /app/output/chats.json --output /app/output/results.json
     ```
 
     ### View Generated Results
@@ -106,7 +120,7 @@ Arguments:
 
 ### 3. Business Intelligence & Analytics
 
-Run the aggregator with default file names:
+Run the aggregator with default file names **(Works in container)**:
 
 ```bash
 python data_aggregator.py
@@ -117,7 +131,7 @@ This expects:
 - generated_chats.json - Your chat dataset
 - analysis_results.json - Your analysis results
 
-Script creates support_analytics.csv that will be used in streamlit_dashboard_app.py for visualizing and exploring support chat analytics in Streamlit Dashboard.
+Script creates support\*analytics.csv that will be used in streamlit_dashboard_app.py for visualizing and exploring support chat analytics in Streamlit Dashboard **(Doesn't work in container)**.
 
 ```bash
 streamlit run streamlit_dashboard_app.py
