@@ -1,5 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Type
+from pydantic import ValidationError, BaseModel
+from judge_agent.models import SupportEvaluationResult
+import json
 
 class Metric(ABC):
     @property
@@ -8,7 +11,7 @@ class Metric(ABC):
         pass
 
     @property
-    def response_schema(self) -> Optional[Dict[str, Any]]:
+    def response_model(self) -> Optional[Type[BaseModel]]:
         return None
 
     @abstractmethod
@@ -16,5 +19,18 @@ class Metric(ABC):
         pass
 
     @abstractmethod
-    def parse_response(self, response: str) -> Dict[str, Any]:
-        pass
+    def parse_response(self, response: Any) -> Dict[str, Any]:
+        try:
+            if isinstance(response, SupportEvaluationResult):
+                return response.model_dump()
+
+            return {
+                "error": "Failed to receive a valid response object",
+                "raw_response": str(response)
+            }
+
+        except ValidationError as e:
+            return {
+                "error": "Failed to parse or validate LLM response",
+                "details": str(e)
+            }

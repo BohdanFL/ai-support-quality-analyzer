@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, computed_field
 from typing import List, Literal, Any
 
 request_intent = Literal[
@@ -23,16 +23,6 @@ class SupportChat(BaseModel):
     type: str = Field(description="The behavior case type (e.g., successful, hidden dissatisfaction)")
     messages: List[Message]
 
-    @field_validator("scenario", mode="before")
-    @classmethod
-    def normalize_scenario(cls, v: str) -> str:
-        if not isinstance(v, str):
-            return v
-        v = v.lower().replace(" ", "_")
-        if v == "payment_issues": return "payment_troubles"
-        if v == "refund_requests": return "refund"
-        return v
-
 # --- Analysis Models ---
 
 class SupportEvaluationResult(BaseModel):
@@ -50,7 +40,7 @@ class SupportEvaluationResult(BaseModel):
         description="Client's request category. If none fits return 'other'."
     )
     satisfaction: Literal["satisfied", "neutral", "unsatisfied"] = Field(
-        description="Level of satisfaction of the client at the end of the communication."
+        description="Level of satisfaction of the client at the end of the communication. Unsatisfied client demonstrates ungratefulness and anger."
     )
     quality_score: int = Field(
         ge=1, le=5, 
@@ -66,3 +56,10 @@ class SupportEvaluationResult(BaseModel):
     ]] = Field(
         description="List of support's mistakes. If there are none, return ['none']."
     )
+    is_problem_solved: bool = Field(
+        description="Define if problem requested in intent was solved by the end of the chat."
+    )
+
+    @computed_field
+    def hidden_unsatisfaction(self) -> bool:
+        return not self.is_problem_solved and self.satisfaction != "unsatisfied"
