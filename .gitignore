@@ -6,4 +6,4 @@ data/tests/
 .vscode/
 *.pdf
 venv/
-.env/
+.env

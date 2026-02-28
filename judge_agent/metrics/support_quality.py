@@ -22,7 +22,7 @@ class SupportQualityMetric(Metric):
         {dialogue}
         
         Your task is to evaluate the dialogue based on these strict rules:
-        1. intent - MUST be one of: payment_troubles, technical_errors, account_access, tariff_questions, refund, other.
+        1. intent - MUST be one of: payment_troubles, technical_errors, account_access, tariff_questions, refund.
         2. satisfaction - MUST be one of: satisfied, neutral, unsatisfied. 
            CRITICAL: Some customers might display "hidden dissatisfaction". They may formally say "thank you" or "okay", but if their problem was NOT actually resolved or the agent provided useless info, mark it as 'unsatisfied' or 'neutral'.
         3. quality_score - rate on scale 1-5. 5 is only for perfect resolution and polite tone.
