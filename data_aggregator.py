@@ -235,8 +235,8 @@ class SupportChatAggregator:
 if __name__ == "__main__":
     # Initialize aggregator
     aggregator = SupportChatAggregator(
-        chats_path='generated_chats.json',
-        results_path='analysis_results.json'
+        chats_path='./data/generated_chats.json',
+        results_path='./data/analysis_results.json'
     )
     
     # Run analysis
