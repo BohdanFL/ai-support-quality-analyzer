@@ -1,7 +1,5 @@
 import os
 from google import genai
-from typing import Optional, Any, Type
-from pydantic import BaseModel
 import instructor
 from providers.base import LLMProvider
 from dotenv import load_dotenv
