@@ -23,6 +23,24 @@ This project implements a synthetic data generation and analysis pipeline for cu
    ```
    *Required:* `GEMINI_API_KEY`, `GROQ_API_KEY`.
 
+---
+
+## 📊 Demo Mode (No API required)
+
+If you want to see the analytics and dashboard without using your own API keys, we have provided a pre-generated dataset in the `examples/` folder.
+
+1. **Aggregate the example data**:
+   ```bash
+   python analytics/data_aggregator.py --chats data/examples/groq_dataset_260.json --results data/examples/groq_analysis_130.json
+   ```
+
+2. **Launch the dashboard**:
+   ```bash
+   streamlit run analytics/streamlit_dashboard_app.py
+   ```
+
+---
+
 ## Quick Start (Local)
 
 If you have your API keys in `.env`, you can run the entire pipeline with default arguments:
