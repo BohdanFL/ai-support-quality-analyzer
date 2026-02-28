@@ -62,7 +62,7 @@ def main():
             "analysis": analysis
         })
         
-    with open(args.output, "w", encoding="utf-8") as f:
+    with open("data/" + args.output, "w", encoding="utf-8") as f:
         json.dump(results, f, ensure_ascii=False, indent=2)
         
     print(f"Successfully saved analysis results to {args.output}")

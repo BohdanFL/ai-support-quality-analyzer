@@ -39,31 +39,17 @@ Make the dialogues feel natural, not overly robotic. Support agents should try t
 def generate_chat(provider, scenario: str, case_type: str) -> Dict:
     prompt = f"Generate a realistic customer support chat about '{scenario}'. The case type is: '{case_type}'."
     
-    # Use Pydantic schema if supported by provider
-    response_text = provider.generate(
+    # Instructor returns a parsed Pydantic model
+    validated_chat = provider.generate(
         prompt, 
         system_prompt=GENERATION_SYSTEM_PROMPT,
-        response_schema=SupportChat
+        response_model=SupportChat
     )
     
-    # Cleaning common LLM artifacts like ```json ... ```
-    cleaned_response = response_text.strip()
-    if cleaned_response.startswith("```"):
-        cleaned_response = cleaned_response.split("\n", 1)[1]
-    if cleaned_response.endswith("```"):
-        cleaned_response = cleaned_response.rsplit("\n", 1)[0]
-    cleaned_response = cleaned_response.strip()
-    if cleaned_response.startswith("json"):
-        cleaned_response = cleaned_response[4:].strip()
-
-    try:
-        data = json.loads(cleaned_response)
-        # Validate with Pydantic
-        validated_chat = SupportChat(**data)
-        return validated_chat.model_dump()
-    except Exception as e:
-        print(f"Error validating/parsing JSON: {str(e)}")
-        return {"error": "Failed to parse/validate", "details": str(e), "raw": response_text}
+    if not validated_chat:
+        return {"error": "Failed to parse/validate"}
+    
+    return validated_chat.model_dump()
 
 def main():
     parser = argparse.ArgumentParser(description="Generate support chat dataset")
@@ -85,7 +71,7 @@ def main():
         chat = generate_chat(provider, scenario, case_type)
         dataset.append(chat)
         
-    with open(args.output, "w", encoding="utf-8") as f:
+    with open("data/" + args.output, "w", encoding="utf-8") as f:
         json.dump(dataset, f, ensure_ascii=False, indent=2)
         
     print(f"Successfully generated dataset to {args.output}")

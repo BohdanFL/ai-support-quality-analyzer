@@ -15,14 +15,13 @@ class LLMJudge:
         evaluation_results = {}
         for metric in self.metrics:
             prompt = metric.build_prompt(dialogue)
-            print("Sending prompt:")
-            print(prompt)
-            print("\nSending to LLM...")
-            llm_response = self.provider.generate(prompt, response_schema=metric.response_schema)
-            print("LLM response:")
-            print(llm_response)
-            print("END")
-            result = metric.parse_response(llm_response)
+            
+            raw_response = self.provider.generate(
+                prompt=prompt,
+                system_prompt="You are an AI assistant tasked with evaluating dialogues strictly following the schema.",
+                response_model=metric.response_model
+            )
+            result = metric.parse_response(raw_response)
             evaluation_results[metric.name] = result
             
         return evaluation_results
