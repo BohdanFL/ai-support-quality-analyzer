@@ -118,19 +118,71 @@ streamlit run analytics/streamlit_dashboard_app.py
 
 ## Docker Support
 
-If you prefer using Docker (especially for local Ollama models):
+If you prefer using Docker (especially for local Ollama models), follow these steps:
 
-1. **Start Containers**:
-   ```bash
-   docker-compose up -d --build
-   ```
+### 1. Start Containers
 
-2. **Run Pipeline inside Container**:
-   ```bash
-   docker exec -it llm_analytics python3 generate.py --provider ollama
-   docker exec -it llm_analytics python3 analyze.py --provider ollama
-   docker exec -it llm_analytics python3 analytics/data_aggregator.py
-   ```
+Choose one of the following commands based on your setup:
+
+**Option A: Start with Ollama (local models)**
+```bash
+docker compose --profile with-ollama up -d --build
+```
+
+**Option B: Start without Ollama (using Cloud API keys)**
+```bash
+docker compose --profile without-ollama up -d --build
+```
+
+### 2. Verify Containers are Running
+```bash
+docker compose ps -a
+```
+
+### 3. Download Required AI Model
+The `with-ollama` profile handles the initial pull automatically. To manually pull or add models:
+```bash
+docker exec ollama-server ollama pull llama3.2:1b
+```
+
+**You can also pull other models:**
+```bash
+docker exec ollama-server ollama pull phi3:mini
+docker exec ollama-server ollama pull mistral
+docker exec ollama-server ollama pull llama3:8b-instruct-q4_K_M
+```
+
+### 4. Access Your Application Container
+You can enter the bash shell of the container:
+```bash
+docker exec -it llm_analytics /bin/bash
+```
+
+Or run the pipeline steps directly:
+```bash
+docker exec -it llm_analytics python generate.py --provider ollama
+docker exec -it llm_analytics python analyze.py --provider ollama
+docker exec -it llm_analytics python analytics/data_aggregator.py
+```
+
+### 5. Cleanup
+
+To stop and remove containers, networks, and images:
+
+**Stop and remove containers:**
+```bash
+docker compose --profile with-ollama down
+```
+
+**Remove volumes (this will delete downloaded Ollama models!):**
+```bash
+docker compose --profile with-ollama down -v
+```
+
+**Complete cleanup (remove all unused images and data):**
+```bash
+docker system prune -a
+```
 
 ## Project Structure
 

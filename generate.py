@@ -82,7 +82,7 @@ def generate_chat(provider, scenario: str, case_type: str, system_prompt: str) -
 def main():
     logging.warning("Logging system active. If you see retries, they will appear below.")
     parser = argparse.ArgumentParser(description="Generate support chat dataset")
-    parser.add_argument("--provider", type=str, default="gemini", help="LLM provider (gemini, groq, ollama)")
+    parser.add_argument("--provider", type=str, default="groq", help="LLM provider (gemini, groq, ollama)")
     parser.add_argument("--model", type=str, help="Specific model name to use")
     parser.add_argument("--count", type=int, default=5, help="Number of chats to generate")
     parser.add_argument("--output", type=str, default=DEFAULT_OUTPUT_PATH, help="Output file")

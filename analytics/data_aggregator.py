@@ -233,8 +233,8 @@ class SupportChatAggregator:
 
 def main():
     parser = argparse.ArgumentParser(description="Aggregate and process support chat data for analytics")
-    parser.add_argument("--chats", type=str, default="data/generated_chats.json", help="Path to generated chats JSON")
-    parser.add_argument("--results", type=str, default="data/analysis_results.json", help="Path to analysis results JSON")
+    parser.add_argument("--chats", type=str, default="data\examples\groq_dataset_260.json", help="Path to generated chats JSON")
+    parser.add_argument("--results", type=str, default="data\examples\groq_analysis_130.json", help="Path to analysis results JSON")
     parser.add_argument("--output", type=str, default="analytics/support_analytics.csv", help="Output CSV path")
     
     args = parser.parse_args()
