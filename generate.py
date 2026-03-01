@@ -26,10 +26,10 @@ def generate_chat(provider, scenario: str, case_type: str, system_prompt: str) -
     agent_p = random.choice(AGENT_PERSONAS)
     customer_p = random.choice(CUSTOMER_PERSONAS)
     
-    is_hidden_dissatisfaction = False
-    if case_type == "problematic":
+    # is_hidden_dissatisfaction = False
+    # if case_type == "problematic":
         # 70% chance to be hidden dissatisfaction in problematic cases
-        is_hidden_dissatisfaction = random.random() < 0.7
+    is_hidden_dissatisfaction = random.random() < 0.7
 
     chosen_mistakes = []
     mistake_description = ""
